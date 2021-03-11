@@ -30,4 +30,14 @@ class ArticleViewModel(application: Application) : AndroidViewModel(application)
             }
         }
     }
+
+    fun nextPage() {
+        launch {
+            val response = DataRepository.getHomeArticleList(article.value.curPage)
+            if (response.errorCode == 0 && response.data != null) {
+                article.emit(response.data)
+                _articles.emit(listOf(_articles.value, response.data.datas).flatten())
+            }
+        }
+    }
 }

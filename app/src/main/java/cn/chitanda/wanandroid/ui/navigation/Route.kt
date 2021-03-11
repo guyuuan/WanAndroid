@@ -1,5 +1,6 @@
 package cn.chitanda.wanandroid.ui.navigation
 
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import cn.chitanda.wanandroid.ui.scenes.HomeScene
@@ -22,6 +23,7 @@ sealed class Route(val id: String) {
     object Login : Route("login")
 }
 
+@ExperimentalMaterialApi
 fun NavGraphBuilder.route() {
     composable(Route.Splash.id) {
         SplashScene()
