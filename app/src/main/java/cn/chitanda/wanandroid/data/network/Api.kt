@@ -21,5 +21,5 @@ interface Api {
     ): HttpJson<User>
 
     @GET("/article/list/{page}/json")
-    suspend fun getHomeArticleList(@Path("page") page: Int): HttpJson<Article>
+    suspend fun getHomeArticles(@Path("page") page: Int): HttpJson<Article>
 }

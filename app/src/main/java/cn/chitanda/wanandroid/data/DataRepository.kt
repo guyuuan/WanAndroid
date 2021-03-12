@@ -14,5 +14,5 @@ object DataRepository {
         networkRepository.login(username, password)
 
     suspend fun getHomeArticleList(page: Int) =
-        networkRepository.getHomeArticleList(page)
+        networkRepository.getHomeArticles(page)
 }

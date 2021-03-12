@@ -27,6 +27,6 @@ class NetworkRepository private constructor() {
     suspend fun login(username: String, password: String) =
         api.login(username = username, password = password)
 
-    suspend fun getHomeArticleList(page: Int) =
-        api.getHomeArticleList(page = page)
+    suspend fun getHomeArticles(page: Int) =
+        api.getHomeArticles(page = page)
 }

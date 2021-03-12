@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
+import androidx.paging.ExperimentalPagingApi
 import cn.chitanda.wanandroid.ui.compose.LocalNavController
 
 /**
@@ -18,6 +19,7 @@ import cn.chitanda.wanandroid.ui.compose.LocalNavController
  * @Date:         2021/3/9 11:37
  * @Description:
  */
+@ExperimentalPagingApi
 @ExperimentalMaterialApi
 @Composable
 fun Router(navController: NavHostController = rememberNavController()) {

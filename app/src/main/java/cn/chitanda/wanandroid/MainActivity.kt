@@ -14,6 +14,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.paging.ExperimentalPagingApi
 import cn.chitanda.wanandroid.ui.compose.LocalSystemBar
 import cn.chitanda.wanandroid.ui.compose.LocalWindowInsetsController
 import cn.chitanda.wanandroid.ui.navigation.Router
@@ -21,6 +22,7 @@ import cn.chitanda.wanandroid.ui.theme.WanAndroidTheme
 import cn.chitanda.wanandroid.utils.px2dp
 
 class MainActivity : ComponentActivity() {
+    @ExperimentalPagingApi
     @ExperimentalMaterialApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -15,17 +15,19 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -38,6 +40,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.paging.ExperimentalPagingApi
+import androidx.paging.compose.collectAsLazyPagingItems
 import cn.chitanda.wanandroid.R
 import cn.chitanda.wanandroid.data.bean.Article
 import cn.chitanda.wanandroid.ui.compose.Center
@@ -49,15 +53,16 @@ import cn.chitanda.wanandroid.viewmodel.ArticleViewModel
  * @Date:         2021/3/10 11:43
  * @Description:
  */
+@ExperimentalPagingApi
 @ExperimentalMaterialApi
 @Composable
 fun HomeScene() {
     val systemBar = LocalSystemBar.current
     val viewModel = viewModel<ArticleViewModel>()
-    val articles by viewModel.articles.collectAsState()
+    val articles by mutableStateOf(viewModel.articles.collectAsLazyPagingItems())
 
     Scaffold(modifier = Modifier
-        .padding(top = systemBar.first)
+        .padding(top = systemBar.first, bottom = systemBar.second)
         .fillMaxSize(), topBar = {
         TopAppBar(title = { Text(text = stringResource(id = R.string.app_name)) })
     }) {
@@ -65,13 +70,13 @@ fun HomeScene() {
             painter = painterResource(id = R.drawable.ic_jetpack), contentDescription = "",
             modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Fit
         )
-        Crossfade(targetState = articles.isEmpty()) {
+        Crossfade(targetState = articles.itemCount == 0) {
             if (it) {
                 Center(modifier = Modifier.fillMaxSize()) {
                     CircularProgressIndicator()
                 }
             } else {
-                ArticleList(articles, viewModel)
+                ArticleList(articles.snapshot().items, viewModel)
             }
         }
     }
@@ -84,20 +89,21 @@ fun ArticleList(articles: List<Article.Data>, viewModel: ArticleViewModel) {
     LazyColumn(
         horizontalAlignment = Alignment.CenterHorizontally,
         state = listState,
-        modifier = Modifier
-            .fillMaxSize(),
     ) {
         itemsIndexed(articles) { index, article ->
             ArticleItem(article = article, position = index)
         }
         item {
             Card(elevation = 4.dp, modifier = Modifier.clickable {
-                viewModel.nextPage()
+//                viewModel.nextPage()
             }) {
                 Text(text = "加载更多", modifier = Modifier.padding(vertical = 8.dp, horizontal = 4.dp))
             }
         }
     }
+//    if (listState.firstVisibleItemIndex > articles.size - 10) {
+//        viewModel.nextPage()
+//    }
 }
 
 @Composable
@@ -121,13 +127,13 @@ fun ArticleItem(article: Article.Data, position: Int) {
                     .background(
                         Color(0xFF073042)
                     )
-                    .size(90.dp)
+                    .size(95.dp)
                     .clip(MaterialTheme.shapes.medium),
                 contentScale = ContentScale.Crop
             )
             Column(
                 modifier = Modifier
-                    .height(90.dp)
+                    .height(95.dp)
                     .padding(8.dp),
                 verticalArrangement = Arrangement.SpaceBetween,
                 horizontalAlignment = Alignment.Start
@@ -147,9 +153,22 @@ fun ArticleItem(article: Article.Data, position: Int) {
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     //分类
-                    Text(text = article.superChapterName)
+                    Surface(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(10.dp)),
+                        color = MaterialTheme.colors.primary
+                    ) {
+                        Text(
+                            text = article.superChapterName,
+                            maxLines = 1, overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                        )
+                    }
                     //作者
-                    Text(text = if (article.author.isEmpty()) article.shareUser else article.author)
+                    Text(
+                        text = if (article.author.isEmpty()) article.shareUser else article.author,
+                        maxLines = 1, overflow = TextOverflow.Ellipsis,
+                    )
                 }
             }
         }
