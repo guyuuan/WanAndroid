@@ -1,19 +1,17 @@
 package cn.chitanda.wanandroid.viewmodel
 
 import android.app.Application
-import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.compose.collectAsLazyPagingItems
-import cn.chitanda.wanandroid.data.DataRepository
 import cn.chitanda.wanandroid.data.bean.Article
 import cn.chitanda.wanandroid.data.database.CacheRepository
 import cn.chitanda.wanandroid.data.paging.RemoteArticleDataSource
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 /**
@@ -22,7 +20,7 @@ import kotlinx.coroutines.flow.StateFlow
  * @Description:
  */
 class ArticleViewModel(application: Application) : AndroidViewModel(application) {
-//        private val _articles = MutableStateFlow(listOf<Article.Data>())
+    //        private val _articles = MutableStateFlow(listOf<Article.Data>())
 //    private val article = MutableStateFlow(Article())
 //    val articles: StateFlow<List<Article.Data>> get() = _articles
 //
@@ -50,16 +48,16 @@ class ArticleViewModel(application: Application) : AndroidViewModel(application)
 //            }
 //        }
 //    }
-    @ExperimentalPagingApi
-    val articleRemoteMediator = RemoteArticleDataSource(application.applicationContext)
 
     private val cacheRepository = CacheRepository.getInstance(application.applicationContext)
+
     @ExperimentalPagingApi
     val articles by lazy {
         Pager(config = PagingConfig(pageSize = 20, enablePlaceholders = true),
-            remoteMediator = articleRemoteMediator,
+            remoteMediator = RemoteArticleDataSource(application.applicationContext),
             pagingSourceFactory = {
                 cacheRepository.getCachedArticles()
             }).flow.cachedIn(viewModelScope)
     }
+
 }

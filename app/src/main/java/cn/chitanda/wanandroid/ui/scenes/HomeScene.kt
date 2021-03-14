@@ -1,9 +1,8 @@
 package cn.chitanda.wanandroid.ui.scenes
 
-import androidx.compose.animation.Crossfade
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,7 +12,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
@@ -26,8 +24,6 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -41,7 +37,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.paging.ExperimentalPagingApi
+import androidx.paging.LoadState
+import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemsIndexed
 import cn.chitanda.wanandroid.R
 import cn.chitanda.wanandroid.data.bean.Article
 import cn.chitanda.wanandroid.ui.compose.Center
@@ -59,7 +58,7 @@ import cn.chitanda.wanandroid.viewmodel.ArticleViewModel
 fun HomeScene() {
     val systemBar = LocalSystemBar.current
     val viewModel = viewModel<ArticleViewModel>()
-    val articles by mutableStateOf(viewModel.articles.collectAsLazyPagingItems())
+    val articles = viewModel.articles.collectAsLazyPagingItems()
 
     Scaffold(modifier = Modifier
         .padding(top = systemBar.first, bottom = systemBar.second)
@@ -70,40 +69,38 @@ fun HomeScene() {
             painter = painterResource(id = R.drawable.ic_jetpack), contentDescription = "",
             modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Fit
         )
-        Crossfade(targetState = articles.itemCount == 0) {
-            if (it) {
-                Center(modifier = Modifier.fillMaxSize()) {
-                    CircularProgressIndicator()
-                }
-            } else {
-                ArticleList(articles.snapshot().items, viewModel)
-            }
-        }
+        ArticleList(articles)
     }
 }
 
 @ExperimentalMaterialApi
 @Composable
-fun ArticleList(articles: List<Article.Data>, viewModel: ArticleViewModel) {
+fun ArticleList(articles: LazyPagingItems<Article.Data>) {
     val listState = rememberLazyListState()
     LazyColumn(
+        modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         state = listState,
     ) {
-        itemsIndexed(articles) { index, article ->
-            ArticleItem(article = article, position = index)
+        itemsIndexed(articles) { position, article ->
+            article?.let {
+                ArticleItem(article = it, position = position)
+            }
         }
-        item {
-            Card(elevation = 4.dp, modifier = Modifier.clickable {
-//                viewModel.nextPage()
-            }) {
-                Text(text = "加载更多", modifier = Modifier.padding(vertical = 8.dp, horizontal = 4.dp))
+        with(articles) {
+            when {
+                loadState.refresh is LoadState.Loading -> {
+                    item {
+                        LoadingView(Modifier.fillMaxSize())
+                    }
+                }
+                loadState.refresh is LoadState.Error || loadState.append is LoadState.Error -> {
+                }
+                else -> {
+                }
             }
         }
     }
-//    if (listState.firstVisibleItemIndex > articles.size - 10) {
-//        viewModel.nextPage()
-//    }
 }
 
 @Composable
@@ -172,6 +169,13 @@ fun ArticleItem(article: Article.Data, position: Int) {
                 }
             }
         }
+    }
+}
+
+@Composable
+fun LoadingView(modifier: Modifier = Modifier) {
+    Center(modifier) {
+        CircularProgressIndicator()
     }
 }
 

@@ -16,7 +16,6 @@ class CacheRepository private constructor(context: Context) {
     companion object {
         @Volatile
         private var instance: CacheRepository? = null
-
         fun getInstance(context: Context) = instance ?: synchronized(this) {
             instance ?: CacheRepository(context).also { instance = it }
         }
@@ -27,4 +26,5 @@ class CacheRepository private constructor(context: Context) {
     fun cacheArticles(articles: List<Article.Data>) = articleDao.insertArticles(articles)
 
     fun clearArticleCache() = articleDao.deleteAllArticles()
+
 }

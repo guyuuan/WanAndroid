@@ -22,6 +22,9 @@ object RetrofitCreator {
                         message
                     )
                 }.apply { level = HttpLoggingInterceptor.Level.BODY })
+                    .addInterceptor(HttpLoggingInterceptor { log ->
+                        Log.i("RetrofitLog", "log: $log")
+                    }.apply { level = HttpLoggingInterceptor.Level.BASIC })
                     .addInterceptor(ReceivedCookiesInterceptor())
                     .addInterceptor(AddCookiesInterceptor())
                     .build()
