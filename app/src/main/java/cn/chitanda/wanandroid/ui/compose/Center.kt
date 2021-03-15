@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
  * @Description:
  */
 @Composable
-fun Center(modifier: Modifier, content: @Composable () -> Unit) {
+fun Center(modifier: Modifier=Modifier, content: @Composable () -> Unit) {
     Box(modifier = modifier, contentAlignment = Alignment.Center) {
         content.invoke()
     }

@@ -15,6 +15,7 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.paging.ExperimentalPagingApi
+import cn.chitanda.compose.networkimage.glide.ProvideGlideLoader
 import cn.chitanda.wanandroid.ui.compose.LocalSystemBar
 import cn.chitanda.wanandroid.ui.compose.LocalWindowInsetsController
 import cn.chitanda.wanandroid.ui.navigation.Router
@@ -47,7 +48,9 @@ class MainActivity : ComponentActivity() {
                     LocalWindowInsetsController provides insetsController,
                     LocalSystemBar provides (statusBarHeight to navBarHeight)
                 ) {
-                    Router()
+                    ProvideGlideLoader {
+                        Router()
+                    }
                 }
             }
         }

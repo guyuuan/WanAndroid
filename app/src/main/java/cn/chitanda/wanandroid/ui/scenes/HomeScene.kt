@@ -1,6 +1,5 @@
 package cn.chitanda.wanandroid.ui.scenes
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -41,6 +40,7 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemsIndexed
+import cn.chitanda.compose.networkimage.core.NetworkImage
 import cn.chitanda.wanandroid.R
 import cn.chitanda.wanandroid.data.bean.Article
 import cn.chitanda.wanandroid.ui.compose.Center
@@ -117,17 +117,24 @@ fun ArticleItem(article: Article.Data, position: Int) {
         elevation = 4.dp
     ) {
         Row {
-            Image(
-                painter = painterResource(id = R.drawable.ic_jetpack),
-                contentDescription = "",
-                modifier = Modifier
-                    .background(
-                        Color(0xFF073042)
-                    )
-                    .size(95.dp)
-                    .clip(MaterialTheme.shapes.medium),
-                contentScale = ContentScale.Crop
-            )
+            if (article.envelopePic.isNotEmpty() && article.envelopePic.startsWith("http")) {
+                NetworkImage(url = article.envelopePic,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .background(
+                            Color(0xFF073042)
+                        )
+                        .size(95.dp)
+                        .clip(MaterialTheme.shapes.medium), onLoading = {
+                        Center(modifier = Modifier.fillMaxSize()) {
+                            CircularProgressIndicator()
+                        }
+                    }, onFailure = {
+                        NoEnvelopePic()
+                    })
+            } else {
+                NoEnvelopePic()
+            }
             Column(
                 modifier = Modifier
                     .height(95.dp)
@@ -170,6 +177,21 @@ fun ArticleItem(article: Article.Data, position: Int) {
             }
         }
     }
+}
+
+@Composable
+fun NoEnvelopePic() {
+    Image(
+        painter = painterResource(id = R.drawable.ic_jetpack),
+        contentDescription = "",
+        modifier = Modifier
+            .background(
+                Color(0xFF073042)
+            )
+            .size(95.dp)
+            .clip(MaterialTheme.shapes.medium),
+        contentScale = ContentScale.Crop
+    )
 }
 
 @Composable
