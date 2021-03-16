@@ -42,9 +42,11 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.navigate
+import androidx.navigation.compose.popUpTo
 import cn.chitanda.wanandroid.R
 import cn.chitanda.wanandroid.ui.compose.Center
 import cn.chitanda.wanandroid.ui.compose.LocalNavController
+import cn.chitanda.wanandroid.ui.compose.LocaleUserViewModel
 import cn.chitanda.wanandroid.ui.navigation.Route
 import cn.chitanda.wanandroid.ui.theme.AvatarBorderColors
 import cn.chitanda.wanandroid.utils.px2dp
@@ -60,7 +62,7 @@ import com.tencent.mmkv.MMKV
 fun LoginScene() {
     val navController = LocalNavController.current
     val context = LocalContext.current
-    val viewModel = viewModel<UserViewModel>()
+    val viewModel = LocaleUserViewModel.current
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var avatarY by remember { mutableStateOf(0.dp) }
@@ -104,8 +106,17 @@ fun LoginScene() {
                 )
                 Spacer(modifier = Modifier.height(24.dp))
                 TextButton(onClick = {
+                    if (username.isBlank() || password.isBlank()) {
+                        Toast.makeText(
+                            context,
+                            "username or password must not empty",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        return@TextButton
+                    }
                     viewModel.login(username, password) { errorCode, msg ->
                         if (errorCode == 0) {
+                            navController.popBackStack()
                             navController.navigate(Route.Home.id)
                         } else {
                             Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()

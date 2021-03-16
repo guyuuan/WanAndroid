@@ -47,6 +47,9 @@ class RemoteArticleDataSource(context: Context) : RemoteMediator<Int, Article.Da
                 val articles = response.data?.datas
                     ?: throw RuntimeException("failed get articles in page $page")
                 nextKey = response.data.curPage
+                if (loadType == LoadType.REFRESH){
+                    cacheRepository.clearArticleCache()
+                }
                 cacheRepository.cacheArticles(articles)
                 MediatorResult.Success(endOfPaginationReached = state.pages.size >=response.data.pageCount)
             }
