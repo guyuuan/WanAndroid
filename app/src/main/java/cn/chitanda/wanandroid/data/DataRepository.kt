@@ -13,6 +13,5 @@ object DataRepository {
     suspend fun login(username: String, password: String) =
         networkRepository.login(username, password)
 
-    suspend fun getHomeArticleList(page: Int) =
-        networkRepository.getHomeArticles(page)
+    suspend fun getTodayImage() = networkRepository.getTodayImage()
 }

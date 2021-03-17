@@ -1,12 +1,16 @@
 package cn.chitanda.wanandroid.ui.scenes
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
-import cn.chitanda.wanandroid.R
+import cn.chitanda.compose.networkimage.core.NetworkImage
+import cn.chitanda.wanandroid.ui.compose.Center
+import cn.chitanda.wanandroid.ui.compose.LocalUserViewModel
 
 /**
  * @Author:       Chen
@@ -15,9 +19,23 @@ import cn.chitanda.wanandroid.R
  */
 @Composable
 fun SplashScene() {
-    Image(
-        painter = painterResource(id = R.drawable.ic_launcher_background),
-        contentDescription = "SplashScene", modifier = Modifier.fillMaxSize(),
-        contentScale = ContentScale.Crop
-    )
+    val userViewModel = LocalUserViewModel.current
+    val imageUrl by userViewModel.imageUrl.collectAsState()
+    if (imageUrl.isNotBlank()) {
+        NetworkImage(
+            url = imageUrl,
+            contentDescription = "SplashScene", modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.FillWidth,
+            onLoading = {
+                Center(modifier = Modifier.fillMaxSize()) {
+                    CircularProgressIndicator()
+                }
+            }, onFailure = {
+                Center(modifier = Modifier.fillMaxSize()) {
+                    Text(text = it.toString())
+                }
+            }
+        )
+    }
+
 }

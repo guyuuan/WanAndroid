@@ -40,17 +40,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.navigate
-import androidx.navigation.compose.popUpTo
 import cn.chitanda.wanandroid.R
 import cn.chitanda.wanandroid.ui.compose.Center
 import cn.chitanda.wanandroid.ui.compose.LocalNavController
-import cn.chitanda.wanandroid.ui.compose.LocaleUserViewModel
+import cn.chitanda.wanandroid.ui.compose.LocalUserViewModel
 import cn.chitanda.wanandroid.ui.navigation.Route
 import cn.chitanda.wanandroid.ui.theme.AvatarBorderColors
 import cn.chitanda.wanandroid.utils.px2dp
-import cn.chitanda.wanandroid.viewmodel.UserViewModel
 import com.tencent.mmkv.MMKV
 
 /**
@@ -62,7 +59,7 @@ import com.tencent.mmkv.MMKV
 fun LoginScene() {
     val navController = LocalNavController.current
     val context = LocalContext.current
-    val viewModel = LocaleUserViewModel.current
+    val viewModel = LocalUserViewModel.current
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var avatarY by remember { mutableStateOf(0.dp) }

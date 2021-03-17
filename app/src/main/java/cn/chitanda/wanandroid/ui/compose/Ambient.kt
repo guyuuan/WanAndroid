@@ -19,5 +19,5 @@ val LocalNavController = staticCompositionLocalOf<NavHostController> { error("No
 val LocalWindowInsetsController =
     staticCompositionLocalOf<WindowInsetsControllerCompat> { error("No WindowInsetsController") }
 val LocalSystemBar = compositionLocalOf { 0.dp to 0.dp }
-val LocaleUserViewModel = compositionLocalOf<UserViewModel> { error("No user ViewModel") }
-val LocaleWindow = compositionLocalOf<Window> { error("No Window") }
+val LocalUserViewModel = compositionLocalOf<UserViewModel> { error("No user ViewModel") }
+val LocalWindow = compositionLocalOf<Window> { error("No Window") }

@@ -13,7 +13,7 @@ import cn.chitanda.wanandroid.ui.scenes.SplashScene
  * @Date:         2021/3/9 11:37
  * @Description:
  */
-val initialRoute = Route.Login.id
+val initialRoute = Route.Splash.id
 
 sealed class Route(val id: String) {
     //    const val Splash = "splash"

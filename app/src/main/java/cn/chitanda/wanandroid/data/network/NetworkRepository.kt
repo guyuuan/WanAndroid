@@ -29,4 +29,6 @@ class NetworkRepository private constructor() {
 
     suspend fun getHomeArticles(page: Int) =
         api.getHomeArticles(page = page)
+
+    suspend fun getTodayImage() = api.getTodayImage()
 }

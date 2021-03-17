@@ -19,8 +19,8 @@ import androidx.paging.ExperimentalPagingApi
 import cn.chitanda.compose.networkimage.glide.ProvideGlideLoader
 import cn.chitanda.wanandroid.ui.compose.LocalSystemBar
 import cn.chitanda.wanandroid.ui.compose.LocalWindowInsetsController
-import cn.chitanda.wanandroid.ui.compose.LocaleUserViewModel
-import cn.chitanda.wanandroid.ui.compose.LocaleWindow
+import cn.chitanda.wanandroid.ui.compose.LocalUserViewModel
+import cn.chitanda.wanandroid.ui.compose.LocalWindow
 import cn.chitanda.wanandroid.ui.navigation.Router
 import cn.chitanda.wanandroid.ui.theme.WanAndroidTheme
 import cn.chitanda.wanandroid.utils.px2dp
@@ -51,8 +51,8 @@ class MainActivity : ComponentActivity() {
                 CompositionLocalProvider(
                     LocalWindowInsetsController provides insetsController,
                     LocalSystemBar provides (statusBarHeight to navBarHeight),
-                    LocaleUserViewModel provides userViewModel,
-//                    LocaleWindow provides window
+                    LocalUserViewModel provides userViewModel,
+                    LocalWindow provides window
                 ) {
                     ProvideGlideLoader {
                         Router()
