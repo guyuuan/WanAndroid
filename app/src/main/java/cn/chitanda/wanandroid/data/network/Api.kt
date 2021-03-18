@@ -24,6 +24,6 @@ interface Api {
     @GET("/article/list/{page}/json")
     suspend fun getHomeArticles(@Path("page") page: Int): HttpJson<Article>
 
-    @GET("https://cn.bing.com/HPImageArchive.aspx?format=js&cc=cn&idx=0&n=1")
-    suspend fun getTodayImage():BingImage
+    @GET("https://cn.bing.com/HPImageArchive.aspx?format=js&cc=cn&idx=0")
+    suspend fun getTodayImage(@Query("n") imageCount: Int = 8): BingImage
 }

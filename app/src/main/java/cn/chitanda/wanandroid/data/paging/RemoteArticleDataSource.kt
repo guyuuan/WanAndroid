@@ -21,8 +21,14 @@ private const val DEFAULT_PAGE_SIZE = 20
 
 @ExperimentalPagingApi
 class RemoteArticleDataSource(context: Context) : RemoteMediator<Int, Article.Data>() {
-    private val cacheRepository = CacheRepository.getInstance(context)
+    private val cacheRepository by lazy {
+        CacheRepository.getInstance(context)
+    }
     private var nextKey = 0
+
+    override suspend fun initialize(): InitializeAction {
+        return InitializeAction.SKIP_INITIAL_REFRESH
+    }
 
     @ExperimentalPagingApi
     override suspend fun load(
@@ -32,6 +38,9 @@ class RemoteArticleDataSource(context: Context) : RemoteMediator<Int, Article.Da
         return try {
             val page = when (loadType) {
                 LoadType.REFRESH -> {
+                    withContext(Dispatchers.IO) {
+                        cacheRepository.clearArticleCache()
+                    }
                     DEFAULT_START_PAGE
                 }
                 LoadType.APPEND -> {
@@ -47,11 +56,8 @@ class RemoteArticleDataSource(context: Context) : RemoteMediator<Int, Article.Da
                 val articles = response.data?.datas
                     ?: throw RuntimeException("failed get articles in page $page")
                 nextKey = response.data.curPage
-                if (loadType == LoadType.REFRESH){
-                    cacheRepository.clearArticleCache()
-                }
                 cacheRepository.cacheArticles(articles)
-                MediatorResult.Success(endOfPaginationReached = state.pages.size >=response.data.pageCount)
+                MediatorResult.Success(endOfPaginationReached = state.pages.size >= response.data.pageCount)
             }
         } catch (e: Exception) {
             MediatorResult.Error(e)

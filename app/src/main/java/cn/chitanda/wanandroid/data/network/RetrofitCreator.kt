@@ -9,9 +9,10 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
+private const val BASE_URL = "https://www.wanandroid.com/"
+
 object RetrofitCreator {
     private const val TAG = "RetrofitCreator"
-    private const val BASE_URL = "https://www.wanandroid.com/"
 
     private val builder by lazy {
         Retrofit.Builder().baseUrl(BASE_URL)
@@ -41,6 +42,7 @@ object RetrofitCreator {
 
 class ReceivedCookiesInterceptor : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
+        if (!chain.request().url.toString().startsWith(BASE_URL)) return chain.proceed(chain.request())
         val response = chain.proceed(chain.request())
         if (response.headers("Set-Cookie").isNotEmpty()) {
             val cookies = HashSet<String>()

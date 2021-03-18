@@ -57,9 +57,14 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
         launch {
             val images = DataRepository.getTodayImage().images
             if (images.isNotEmpty()) {
-                _imageUrl.emit("http://s.cn.bing.net" + images.first().url)
+                _imageUrl.emit("https://s.cn.bing.net" + images.first().url)
             }
         }
+    }
+
+    fun checkUserData(callback: (Boolean) -> Unit) {
+        val mmkv = MMKV.defaultMMKV() ?: return
+        callback(mmkv.getStringSet("cookie", emptySet())?.isEmpty() == false)
     }
 }
 

@@ -1,5 +1,8 @@
 package cn.chitanda.wanandroid.ui.scenes.home
 
+import android.content.res.Resources
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -25,12 +28,19 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -46,9 +56,10 @@ import cn.chitanda.compose.networkimage.core.NetworkImage
 import cn.chitanda.wanandroid.R
 import cn.chitanda.wanandroid.data.bean.Article
 import cn.chitanda.wanandroid.ui.compose.Center
-import cn.chitanda.wanandroid.ui.compose.LocalSystemBar
 import cn.chitanda.wanandroid.ui.compose.SwipeToRefreshLayout
+import cn.chitanda.wanandroid.utils.px2dp
 import cn.chitanda.wanandroid.viewmodel.ArticleViewModel
+import dev.chrisbanes.accompanist.insets.statusBarsPadding
 
 /**
  * @Author:       Chen
@@ -60,12 +71,11 @@ import cn.chitanda.wanandroid.viewmodel.ArticleViewModel
 @ExperimentalPagingApi
 @Composable
 fun Articles() {
-    val systemBar = LocalSystemBar.current
     val viewModel = viewModel<ArticleViewModel>()
     val articles = viewModel.articles.collectAsLazyPagingItems()
 
     Scaffold(modifier = Modifier
-        .padding(top = systemBar.first)
+        .statusBarsPadding()
         .fillMaxSize(), topBar = {
         TopAppBar(title = { Text(text = stringResource(id = R.string.app_name)) })
     }) {
@@ -129,15 +139,29 @@ fun ArticleList(articles: LazyPagingItems<Article.Data>) {
 
 @Composable
 fun ArticleItem(article: Article.Data, position: Int) {
+    var start by remember {
+        mutableStateOf(false)
+    }
+    val width = Resources.getSystem().displayMetrics.widthPixels
+    val alpha by animateFloatAsState(targetValue = if (start) 1f else 0.7f)
+    val offsetX by animateIntAsState(targetValue = if (start) 0 else -width.px2dp() / 2)
+    val scale by animateFloatAsState(targetValue = if (start) 1f else 1.2f)
     Card(
         modifier = Modifier
+            .graphicsLayer {
+                translationX = offsetX.dp.toPx()
+                scaleX = scale
+                scaleY = scale
+                this.alpha = alpha
+            }
             .padding(
                 start = 16.dp,
                 end = 16.dp,
                 top = if (position == 0) 12.dp else 8.dp,
                 bottom = 8.dp
             )
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .onSizeChanged { start = true },
         elevation = 4.dp
     ) {
         Row {
@@ -201,7 +225,11 @@ fun ArticleItem(article: Article.Data, position: Int) {
             }
         }
     }
+    SideEffect {
+//        start = true
+    }
 }
+
 
 @Composable
 fun NoEnvelopePic() {

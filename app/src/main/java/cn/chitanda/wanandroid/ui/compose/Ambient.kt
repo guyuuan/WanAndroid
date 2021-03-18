@@ -18,6 +18,6 @@ import java.util.*
 val LocalNavController = staticCompositionLocalOf<NavHostController> { error("No NavController") }
 val LocalWindowInsetsController =
     staticCompositionLocalOf<WindowInsetsControllerCompat> { error("No WindowInsetsController") }
-val LocalSystemBar = compositionLocalOf { 0.dp to 0.dp }
+//val LocalSystemBar = compositionLocalOf { 0.dp to 0.dp }
 val LocalUserViewModel = compositionLocalOf<UserViewModel> { error("No user ViewModel") }
 val LocalWindow = compositionLocalOf<Window> { error("No Window") }

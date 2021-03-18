@@ -1,5 +1,6 @@
 package cn.chitanda.wanandroid.ui.compose
 
+import android.util.Log
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.offset
@@ -108,10 +109,11 @@ private val <T> SwipeableState<T>.PreUpPostDownNestedScrollConnection: NestedScr
 
         override suspend fun onPreFling(available: Velocity): Velocity {
             val toFling = Offset(available.x, available.y).toFloat()
+            Log.d("SwipeableState", "onPreFling: $toFling")
             return if (toFling < 0) {
                 performFling(velocity = toFling)
                 // since we go to the anchor with tween settling, consume all for the best UX
-                available
+                Velocity.Zero
             } else {
                 Velocity.Zero
             }
@@ -122,7 +124,8 @@ private val <T> SwipeableState<T>.PreUpPostDownNestedScrollConnection: NestedScr
             available: Velocity
         ): Velocity {
             performFling(velocity = Offset(available.x, available.y).toFloat())
-            return Velocity.Zero
+            Log.d("SwipeableState", "onPostFling:${available.y}")
+            return available
         }
 
         private fun Float.toOffset(): Offset = Offset(0f, this)

@@ -9,6 +9,7 @@ import android.content.res.Resources
  */
 
 val density = Resources.getSystem().displayMetrics.density
+
 fun Int.px2dp(): Int {
     return (this / density + 0.5f).toInt()
 }

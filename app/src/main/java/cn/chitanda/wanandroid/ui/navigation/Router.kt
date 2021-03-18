@@ -13,6 +13,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import androidx.paging.ExperimentalPagingApi
 import cn.chitanda.wanandroid.ui.compose.LocalNavController
+import dev.chrisbanes.accompanist.insets.imePadding
 
 /**
  * @Author:       Chen
@@ -28,6 +29,7 @@ fun Router(navController: NavHostController = rememberNavController()) {
     ) {
         Box(
             modifier = Modifier
+                .imePadding()
                 .fillMaxSize()
                 .background(MaterialTheme.colors.primary)
         ) {

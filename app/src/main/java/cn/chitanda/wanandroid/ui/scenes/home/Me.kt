@@ -1,6 +1,5 @@
 package cn.chitanda.wanandroid.ui.scenes.home
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -9,19 +8,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
-import androidx.core.graphics.drawable.toBitmap
-import cn.chitanda.wanandroid.R
+import cn.chitanda.compose.networkimage.core.NetworkImage
 import cn.chitanda.wanandroid.ui.compose.Center
 import cn.chitanda.wanandroid.ui.compose.LocalUserViewModel
 import cn.chitanda.wanandroid.ui.compose.LocalWindowInsetsController
 import cn.chitanda.wanandroid.utils.isLightImage
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * @Author:       Chen
@@ -31,31 +29,34 @@ import kotlinx.coroutines.launch
 @Composable
 fun Me() {
     val viewModel = LocalUserViewModel.current
-    val scope = rememberCoroutineScope()
     val user by viewModel.user.collectAsState()
-    val window = LocalWindowInsetsController.current
-    val context = LocalContext.current
-    val bitmap = context.getDrawable(R.drawable.asuka)?.toBitmap()
+    val imageUrl by viewModel.imageUrl.collectAsState()
+    var isLightImage by mutableStateOf(false)
+    val windowInsetsController = LocalWindowInsetsController.current
     Column(modifier = Modifier.fillMaxSize()) {
-        Image(
-            bitmap = bitmap?.asImageBitmap()!!,
+        NetworkImage(
+            url = imageUrl,
             contentDescription = "avatar",
             contentScale = ContentScale.FillWidth,
-            modifier = Modifier
-                .fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            onGetBitMap = { bitmap ->
+                withContext(Dispatchers.IO) {
+                    isLightImage = isLightImage(bitmap.asAndroidBitmap())
+                }
+            }
         )
-        Center(modifier = Modifier.fillMaxSize()) {
+        Center(
+            modifier = Modifier
+                .fillMaxSize()
+                .weight(1f)
+        ) {
             Text(text = "Username:${user.username}")
         }
     }
-    DisposableEffect(key1 = bitmap) {
-//        window.isAppearanceLightStatusBars = true
-        scope.launch(Dispatchers.IO) {
-            val isLight = isLightImage(bitmap ?: return@launch)
-            window.isAppearanceLightStatusBars = isLight
-        }
+    DisposableEffect(key1 = isLightImage) {
+        windowInsetsController.isAppearanceLightStatusBars = isLightImage
         onDispose {
-            window.isAppearanceLightStatusBars = false
+            windowInsetsController.isAppearanceLightStatusBars = false
         }
     }
 }
