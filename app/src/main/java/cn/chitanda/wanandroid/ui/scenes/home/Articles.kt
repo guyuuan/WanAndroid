@@ -55,6 +55,7 @@ import androidx.paging.compose.itemsIndexed
 import cn.chitanda.compose.networkimage.core.NetworkImage
 import cn.chitanda.wanandroid.R
 import cn.chitanda.wanandroid.data.bean.Article
+import cn.chitanda.wanandroid.ui.compose.Banner
 import cn.chitanda.wanandroid.ui.compose.Center
 import cn.chitanda.wanandroid.ui.compose.SwipeToRefreshLayout
 import cn.chitanda.wanandroid.utils.px2dp
@@ -83,7 +84,6 @@ fun Articles() {
             painter = painterResource(id = R.drawable.ic_jetpack), contentDescription = "",
             modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Fit
         )
-
         SwipeToRefreshLayout(
             refreshingState = articles.loadState.refresh is LoadState.Loading,
             onRefresh = { articles.refresh() },
@@ -102,17 +102,27 @@ fun Articles() {
                     )
                 }
             }) {
-            ArticleList(articles)
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
+                Banner(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(3f)
+                )
+                ArticleList(articles, modifier = Modifier.weight(8f))
+            }
         }
     }
 }
 
 @ExperimentalMaterialApi
 @Composable
-fun ArticleList(articles: LazyPagingItems<Article.Data>) {
+fun ArticleList(articles: LazyPagingItems<Article.Data>, modifier: Modifier = Modifier) {
     val listState = rememberLazyListState()
     LazyColumn(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier then Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         state = listState,
     ) {
