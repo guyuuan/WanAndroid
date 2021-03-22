@@ -1,6 +1,7 @@
 package cn.chitanda.wanandroid.data.network
 
 import cn.chitanda.wanandroid.data.bean.Article
+import cn.chitanda.wanandroid.data.bean.Banner
 import cn.chitanda.wanandroid.data.bean.BingImage
 import cn.chitanda.wanandroid.data.bean.HttpJson
 import cn.chitanda.wanandroid.data.bean.User
@@ -23,6 +24,9 @@ interface Api {
 
     @GET("/article/list/{page}/json")
     suspend fun getHomeArticles(@Path("page") page: Int): HttpJson<Article>
+
+    @GET("/banner/json")
+    suspend fun getBanners(): HttpJson<List<Banner>>
 
     @GET("https://cn.bing.com/HPImageArchive.aspx?format=js&cc=cn&idx=0")
     suspend fun getTodayImage(@Query("n") imageCount: Int = 8): BingImage

@@ -5,6 +5,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -49,8 +50,6 @@ import cn.chitanda.wanandroid.ui.navigation.Route
 import cn.chitanda.wanandroid.ui.theme.AvatarBorderColors
 import cn.chitanda.wanandroid.utils.px2dp
 import com.tencent.mmkv.MMKV
-import dev.chrisbanes.accompanist.insets.LocalWindowInsets
-import dev.chrisbanes.accompanist.insets.imePadding
 
 /**
  * @Author:       Chen
@@ -148,6 +147,10 @@ fun LoginScene() {
                     )
                 )
                 .border(width = 6.dp, color = Color.White, shape = CircleShape)
+                .clickable {
+                    navController.popBackStack()
+                    navController.navigate(Route.Home.id)
+                }
         )
     }
     LaunchedEffect(key1 = Route.Home.id) {

@@ -7,16 +7,19 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import cn.chitanda.wanandroid.data.bean.Article
+import cn.chitanda.wanandroid.data.bean.Banner
 import cn.chitanda.wanandroid.data.database.dao.ArticleDao
+import cn.chitanda.wanandroid.data.database.dao.BannerDao
 
 /**
  * @Author:       Chen
  * @Date:         2021/3/12 14:25
  * @Description:
  */
-@Database(entities = [Article.Data::class], version = 1, exportSchema = false)
+@Database(entities = [Article.Data::class, Banner::class], version = 2, exportSchema = false)
 abstract class CacheDataBase : RoomDatabase() {
     abstract fun articleDao(): ArticleDao
+    abstract fun bannerDao(): BannerDao
 
     companion object {
         @Volatile
@@ -33,6 +36,7 @@ abstract class CacheDataBase : RoomDatabase() {
                         Log.d("CacheDB", "onCreate: ")
                     }
                 })
+                .fallbackToDestructiveMigration()
                 .build()
     }
 }

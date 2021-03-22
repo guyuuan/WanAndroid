@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cn.chitanda.wanandroid.data.DataRepository
 import cn.chitanda.wanandroid.data.bean.User
+import cn.chitanda.wanandroid.ui.navigation.Route
 import com.tencent.mmkv.MMKV
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,17 +23,18 @@ import kotlinx.coroutines.withContext
 private const val TAG = "UserViewModel"
 
 class UserViewModel(application: Application) : AndroidViewModel(application) {
-    private val _user = MutableStateFlow(User())
-    val user: StateFlow<User> get() = _user
+    private val _user = MutableStateFlow<User?>(null)
+    val user: StateFlow<User?> get() = _user
 
     init {
         getTodayImage()
     }
 
-    private val _imageUrl = MutableStateFlow("")
-    val imageUrl: StateFlow<String> get() = _imageUrl
+    private val _imageUrl = MutableStateFlow(emptyList<String>())
+    val imageUrl: StateFlow<List<String>> get() = _imageUrl
 
     fun login(username: String, password: String, callback: (Int, String) -> Unit) {
+        if (username.isBlank() || password.isBlank()) return
         launch {
             val response =
                 DataRepository.login(username, password)
@@ -57,13 +59,21 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
         launch {
             val images = DataRepository.getTodayImage().images
             if (images.isNotEmpty()) {
-                _imageUrl.emit("https://s.cn.bing.net" + images.first().url)
+                val url = "https://s.cn.bing.net" + images.first().url
+                _imageUrl.emit(images.map { "https://s.cn.bing.net" + it.url })
+                val mmkv = MMKV.defaultMMKV() ?: return@launch
+                mmkv.encode(Route.Splash.id, url)
             }
         }
     }
 
     fun checkUserData(callback: (Boolean) -> Unit) {
         val mmkv = MMKV.defaultMMKV() ?: return
+        val username = mmkv.getString("username", "") ?: ""
+        val password = mmkv.getString("password", "") ?: ""
+        login(username, password) { _, _ ->
+
+        }
         callback(mmkv.getStringSet("cookie", emptySet())?.isEmpty() == false)
     }
 }

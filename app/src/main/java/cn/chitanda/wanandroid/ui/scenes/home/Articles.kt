@@ -9,12 +9,15 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -28,7 +31,8 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -55,12 +59,15 @@ import androidx.paging.compose.itemsIndexed
 import cn.chitanda.compose.networkimage.core.NetworkImage
 import cn.chitanda.wanandroid.R
 import cn.chitanda.wanandroid.data.bean.Article
-import cn.chitanda.wanandroid.ui.compose.Banner
+import cn.chitanda.wanandroid.data.bean.Banner
 import cn.chitanda.wanandroid.ui.compose.Center
 import cn.chitanda.wanandroid.ui.compose.SwipeToRefreshLayout
 import cn.chitanda.wanandroid.utils.px2dp
 import cn.chitanda.wanandroid.viewmodel.ArticleViewModel
+import com.tencent.mmkv.MMKV
 import dev.chrisbanes.accompanist.insets.statusBarsPadding
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 /**
  * @Author:       Chen
@@ -74,7 +81,7 @@ import dev.chrisbanes.accompanist.insets.statusBarsPadding
 fun Articles() {
     val viewModel = viewModel<ArticleViewModel>()
     val articles = viewModel.articles.collectAsLazyPagingItems()
-
+    val banners = viewModel.banners.collectAsLazyPagingItems()
     Scaffold(modifier = Modifier
         .statusBarsPadding()
         .fillMaxSize(), topBar = {
@@ -106,12 +113,41 @@ fun Articles() {
                 modifier = Modifier
                     .fillMaxSize()
             ) {
-                Banner(
-                    modifier = Modifier
+                BannerList(
+                    banners = banners, modifier = Modifier
                         .fillMaxWidth()
-                        .weight(3f)
+                        .weight(2.5f)
                 )
                 ArticleList(articles, modifier = Modifier.weight(8f))
+            }
+        }
+    }
+}
+
+@Composable
+fun BannerList(banners: LazyPagingItems<Banner>, modifier: Modifier = Modifier) {
+    LazyRow(
+        modifier = modifier
+    ) {
+        itemsIndexed(banners) { _, banner ->
+            Card(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .width(Resources.getSystem().displayMetrics.widthPixels.px2dp().dp)
+                    .padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 4.dp)
+            ) {
+                banner?.let {
+                    NetworkImage(
+                        url = it.imagePath,
+                        modifier = Modifier.fillMaxSize(),
+                        onLoading = {
+                            Center(Modifier.fillMaxSize()) {
+                                CircularProgressIndicator()
+                            }
+                        },
+                        contentScale = ContentScale.Crop
+                    )
+                }
             }
         }
     }
@@ -121,6 +157,9 @@ fun Articles() {
 @Composable
 fun ArticleList(articles: LazyPagingItems<Article.Data>, modifier: Modifier = Modifier) {
     val listState = rememberLazyListState()
+    val mmkv = remember {
+        MMKV.defaultMMKV()
+    }
     LazyColumn(
         modifier = modifier then Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -145,6 +184,25 @@ fun ArticleList(articles: LazyPagingItems<Article.Data>, modifier: Modifier = Mo
             }
         }
     }
+
+    DisposableEffect(key1 = listState) {
+        onDispose {
+            mmkv?.encode("HomeArticlesScrollStatusRecord", listState.firstVisibleItemIndex)
+            mmkv?.encode(
+                "HomeArticlesScrollStatusRecordOffset",
+                listState.firstVisibleItemScrollOffset
+            )
+        }
+    }
+    LaunchedEffect(key1 = listState) {
+        this.launch {
+            delay(100)
+            val scrollPosition = mmkv?.getInt("HomeArticlesScrollStatusRecord", 0) ?: 0
+            val offset = mmkv?.getInt("HomeArticlesScrollStatusRecordOffset", 0) ?: 0
+            listState.scrollToItem(scrollPosition, offset)
+        }
+    }
+
 }
 
 @Composable
@@ -171,7 +229,9 @@ fun ArticleItem(article: Article.Data, position: Int) {
                 bottom = 8.dp
             )
             .fillMaxWidth()
-            .onSizeChanged { start = true },
+            .onSizeChanged {
+                start = true
+            },
         elevation = 4.dp
     ) {
         Row {
@@ -235,9 +295,9 @@ fun ArticleItem(article: Article.Data, position: Int) {
             }
         }
     }
-    SideEffect {
+//    SideEffect {
 //        start = true
-    }
+//    }
 }
 
 

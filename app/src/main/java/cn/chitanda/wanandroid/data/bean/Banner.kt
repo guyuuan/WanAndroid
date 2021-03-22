@@ -1,11 +1,15 @@
 package cn.chitanda.wanandroid.data.bean
 
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 
+@Entity(tableName = "banner")
 data class Banner(
     @SerializedName("desc")
     val desc: String,
+    @PrimaryKey
     @SerializedName("id")
     val id: Int,
     @SerializedName("imagePath")

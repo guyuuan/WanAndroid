@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
+import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,28 +31,30 @@ import dev.chrisbanes.accompanist.insets.navigationBarsPadding
 @ExperimentalMaterialApi
 @Composable
 fun HomeScene() {
-//    val systemBar = LocalSystemBar.current
-    var currentTab by remember { mutableStateOf<Tab>(Tab.Home) }
-    Scaffold(
-        modifier = Modifier
-            .navigationBarsPadding()
-            .fillMaxSize()
-            .background(MaterialTheme.colors.primary),
-        bottomBar = {
-            BottomNavBar(currentTab = currentTab) { tab ->
-                currentTab = tab
+    var currentTab by remember {
+        mutableStateOf<Tab>(Tab.Home)
+    }
+    Surface(color = MaterialTheme.colors.primary) {
+        Scaffold(
+            modifier = Modifier
+                .navigationBarsPadding()
+                .fillMaxSize()
+                .background(MaterialTheme.colors.primary),
+            bottomBar = {
+                BottomNavBar(currentTab = currentTab) { tab ->
+                    currentTab = tab
+                }
             }
-        }
-    ) {
-        Crossfade(targetState = currentTab) { tab ->
-            when (tab) {
-                is Tab.Home -> Articles()
-                is Tab.Explore -> Explore()
-                is Tab.Project -> Project()
-                is Tab.Me -> Me()
+        ) {
+            Crossfade(targetState = currentTab) { tab ->
+                when (tab) {
+                    is Tab.Home -> Articles()
+                    is Tab.Explore -> Explore()
+                    is Tab.Project -> Project()
+                    is Tab.Me -> Me()
+                }
             }
         }
     }
 }
-
 

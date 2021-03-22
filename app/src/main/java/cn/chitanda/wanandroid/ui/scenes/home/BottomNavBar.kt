@@ -1,6 +1,7 @@
 package cn.chitanda.wanandroid.ui.scenes.home
 
 import androidx.annotation.DrawableRes
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Icon
@@ -9,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import cn.chitanda.wanandroid.R
+import dev.chrisbanes.accompanist.insets.navigationBarsPadding
 
 /**
  * @Author:       Chen
@@ -25,7 +27,7 @@ sealed class Tab(@DrawableRes val icon: Int, val label: String) {
 
 @Composable
 fun BottomNavBar(currentTab: Tab, onClick: (Tab) -> Unit) {
-    BottomNavigation {
+    BottomNavigation() {
         Tab::class.sealedSubclasses.forEach { tab ->
             tab.objectInstance?.let {
                 BottomNavigationItem(

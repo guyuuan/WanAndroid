@@ -36,7 +36,7 @@ class MainActivity : ComponentActivity() {
                 CompositionLocalProvider(
                     LocalWindowInsetsController provides insetsController,
                     LocalUserViewModel provides userViewModel,
-                    LocalWindow provides window
+                    LocalWindow provides window,
                 ) {
                     ProvideWindowInsets(windowInsetsAnimationsEnabled = true) {
                         ProvideGlideLoader {

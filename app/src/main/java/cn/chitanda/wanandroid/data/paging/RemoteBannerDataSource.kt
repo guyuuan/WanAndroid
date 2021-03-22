@@ -6,7 +6,7 @@ import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import cn.chitanda.wanandroid.data.DataRepository
-import cn.chitanda.wanandroid.data.bean.Article
+import cn.chitanda.wanandroid.data.bean.Banner
 import cn.chitanda.wanandroid.data.database.CacheRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -16,48 +16,38 @@ import kotlinx.coroutines.withContext
  * @Date:         2021/3/12 13:13
  * @Description:
  */
-internal const val DEFAULT_START_PAGE = 0
-//private const val DEFAULT_PAGE_SIZE = 20
 
 @ExperimentalPagingApi
-class RemoteArticleDataSource(context: Context) : RemoteMediator<Int, Article.Data>() {
+class RemoteBannerDataSource(context: Context) : RemoteMediator<Int, Banner>() {
     private val cacheRepository by lazy {
         CacheRepository.getInstance(context)
     }
-    private var nextKey = 0
 
-    override suspend fun initialize(): InitializeAction {
-        return InitializeAction.SKIP_INITIAL_REFRESH
-    }
+//    override suspend fun initialize(): InitializeAction {
+//        return InitializeAction.SKIP_INITIAL_REFRESH
+//    }
 
     @ExperimentalPagingApi
     override suspend fun load(
         loadType: LoadType,
-        state: PagingState<Int, Article.Data>
+        state: PagingState<Int, Banner>
     ): MediatorResult {
         return try {
-            val page = when (loadType) {
+            when (loadType) {
                 LoadType.REFRESH -> {
                     withContext(Dispatchers.IO) {
                         cacheRepository.clearCache()
+                        val banners = DataRepository.getBanners().data ?: emptyList()
+                        cacheRepository.cachedBanners(banners)
+                        MediatorResult.Success(endOfPaginationReached = banners.isEmpty())
                     }
-                    DEFAULT_START_PAGE
                 }
                 LoadType.APPEND -> {
-                    nextKey
+                    return MediatorResult.Success(endOfPaginationReached = true)
                 }
                 LoadType.PREPEND -> {
                     return MediatorResult.Success(endOfPaginationReached = true)
                 }
-            }
-            withContext(Dispatchers.IO) {
-                val response =
-                    DataRepository.getHomeArticles(page)
-                val articles = response.data?.datas
-                    ?: throw RuntimeException("failed get articles in page $page")
-                nextKey = response.data.curPage
-                cacheRepository.cacheArticles(articles)
-                MediatorResult.Success(endOfPaginationReached = state.pages.size >= response.data.pageCount)
             }
         } catch (e: Exception) {
             MediatorResult.Error(e)
