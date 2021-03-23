@@ -58,6 +58,7 @@ class ReceivedCookiesInterceptor : Interceptor {
 
 class AddCookiesInterceptor : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
+        if (!chain.request().url.toString().startsWith(BASE_URL)) return chain.proceed(chain.request())
         val mmkv = MMKV.defaultMMKV()
         val cookies = mmkv?.decodeStringSet("cookie", mutableSetOf()) ?: emptySet()
         val builder = chain.request().newBuilder()

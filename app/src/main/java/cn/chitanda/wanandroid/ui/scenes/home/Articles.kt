@@ -1,8 +1,6 @@
 package cn.chitanda.wanandroid.ui.scenes.home
 
 import android.content.res.Resources
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -33,18 +31,13 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -194,7 +187,7 @@ fun ArticleList(articles: LazyPagingItems<Article.Data>, modifier: Modifier = Mo
             )
         }
     }
-    LaunchedEffect(key1 = listState) {
+    LaunchedEffect(key1 = mmkv) {
         this.launch {
             delay(100)
             val scrollPosition = mmkv?.getInt("HomeArticlesScrollStatusRecord", 0) ?: 0
@@ -207,31 +200,15 @@ fun ArticleList(articles: LazyPagingItems<Article.Data>, modifier: Modifier = Mo
 
 @Composable
 fun ArticleItem(article: Article.Data, position: Int) {
-    var start by remember {
-        mutableStateOf(false)
-    }
-    val width = Resources.getSystem().displayMetrics.widthPixels
-    val alpha by animateFloatAsState(targetValue = if (start) 1f else 0.7f)
-    val offsetX by animateIntAsState(targetValue = if (start) 0 else -width.px2dp() / 2)
-    val scale by animateFloatAsState(targetValue = if (start) 1f else 1.2f)
     Card(
         modifier = Modifier
-            .graphicsLayer {
-                translationX = offsetX.dp.toPx()
-                scaleX = scale
-                scaleY = scale
-                this.alpha = alpha
-            }
             .padding(
                 start = 16.dp,
                 end = 16.dp,
                 top = if (position == 0) 12.dp else 8.dp,
                 bottom = 8.dp
             )
-            .fillMaxWidth()
-            .onSizeChanged {
-                start = true
-            },
+            .fillMaxWidth(),
         elevation = 4.dp
     ) {
         Row {
@@ -295,9 +272,6 @@ fun ArticleItem(article: Article.Data, position: Int) {
             }
         }
     }
-//    SideEffect {
-//        start = true
-//    }
 }
 
 
