@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.navigate
 import androidx.paging.ExperimentalPagingApi
+import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import cn.chitanda.compose.networkimage.core.NetworkImage
 import cn.chitanda.wanandroid.R
@@ -57,27 +58,29 @@ import kotlinx.coroutines.withContext
 fun Me() {
     val viewModel = LocalUserViewModel.current
     val user by viewModel.user.collectAsState()
-    val images = viewModel.images.collectAsLazyPagingItems().snapshot().items
+    val images = viewModel.images.collectAsLazyPagingItems()
     var isLightImage by mutableStateOf(false)
     val windowInsetsController = LocalWindowInsetsController.current
     Column(modifier = Modifier.fillMaxSize()) {
-        NetworkImage(
-            url = images.random().imageUrl,
-            contentDescription = "avatar",
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .fillMaxWidth(),
-            onLoading = {
-                Center(modifier = Modifier.fillMaxWidth()) {
-                    CircularProgressIndicator(color = Color.White)
+        if (images.loadState.refresh is LoadState.NotLoading && images.snapshot().isNotEmpty()) {
+            NetworkImage(
+                url = images.snapshot().items.random().imageUrl,
+                contentDescription = "avatar",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .fillMaxWidth(),
+                onLoading = {
+                    Center(modifier = Modifier.fillMaxWidth()) {
+                        CircularProgressIndicator(color = Color.White)
+                    }
+                },
+                onGetBitMap = { bitmap ->
+                    withContext(Dispatchers.IO) {
+                        isLightImage = isLightImage(bitmap.asAndroidBitmap())
+                    }
                 }
-            },
-            onGetBitMap = { bitmap ->
-                withContext(Dispatchers.IO) {
-                    isLightImage = isLightImage(bitmap.asAndroidBitmap())
-                }
-            }
-        )
+            )
+        }
         UserInfo(
             modifier = Modifier
                 .fillMaxWidth()

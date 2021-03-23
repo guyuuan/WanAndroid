@@ -189,10 +189,10 @@ fun ArticleList(articles: LazyPagingItems<Article.Data>, modifier: Modifier = Mo
     }
     LaunchedEffect(key1 = mmkv) {
         this.launch {
-            delay(100)
+            delay(500)
             val scrollPosition = mmkv?.getInt("HomeArticlesScrollStatusRecord", 0) ?: 0
             val offset = mmkv?.getInt("HomeArticlesScrollStatusRecordOffset", 0) ?: 0
-            listState.scrollToItem(scrollPosition, offset)
+            listState.animateScrollToItem(scrollPosition, offset)
         }
     }
 
