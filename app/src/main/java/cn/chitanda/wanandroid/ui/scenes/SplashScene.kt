@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,6 +39,7 @@ import java.io.File
 @Composable
 fun SplashScene() {
     val viewModel = LocalUserViewModel.current
+    val urls by viewModel.imageUrl.collectAsState()
     val context = LocalContext.current
     var imageUrl by mutableStateOf("")
     var downloadStats by remember { mutableStateOf(false) }
@@ -68,8 +70,8 @@ fun SplashScene() {
             }
         }
     }
-    LaunchedEffect(key1 = imageUrl) {
-        if (imageUrl.isBlank()) {
+    LaunchedEffect(key1 = urls) {
+        if (imageUrl.isBlank()&&urls.isNotEmpty()) {
             val mmkv = MMKV.defaultMMKV()
             val url = mmkv?.decodeString(Route.Splash.id, "") ?: ""
             imageUrl = if (url.isNotBlank()) {

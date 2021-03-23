@@ -50,6 +50,7 @@ import cn.chitanda.wanandroid.ui.navigation.Route
 import cn.chitanda.wanandroid.ui.theme.AvatarBorderColors
 import cn.chitanda.wanandroid.utils.px2dp
 import com.tencent.mmkv.MMKV
+import dev.chrisbanes.accompanist.insets.imePadding
 
 /**
  * @Author:       Chen
@@ -65,7 +66,7 @@ fun LoginScene() {
     var password by remember { mutableStateOf("") }
     var avatarY by remember { mutableStateOf(0.dp) }
     Center(
-        modifier = Modifier
+        modifier = Modifier.imePadding()
             .fillMaxSize()
             .background(MaterialTheme.colors.primarySurface)
     ) {

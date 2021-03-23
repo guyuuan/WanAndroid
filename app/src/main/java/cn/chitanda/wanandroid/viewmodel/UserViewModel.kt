@@ -76,6 +76,14 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
         }
         callback(mmkv.getStringSet("cookie", emptySet())?.isEmpty() == false)
     }
+
+    fun logout() {
+        val mmkv = MMKV.defaultMMKV() ?: return
+        mmkv.clearAll()
+        launch {
+            _user.emit(null)
+        }
+    }
 }
 
 fun ViewModel.launch(
