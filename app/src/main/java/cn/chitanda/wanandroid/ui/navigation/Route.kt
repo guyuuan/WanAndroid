@@ -16,9 +16,6 @@ import cn.chitanda.wanandroid.ui.scenes.SplashScene
 val initialRoute = Route.Splash.id
 
 sealed class Route(val id: String) {
-    //    const val Splash = "splash"
-//    const val Home = "home"
-//    const val Login = "login"
     object Splash : Route("splash")
     object Home : Route("home")
     object Login : Route("login")
@@ -37,15 +34,3 @@ fun NavGraphBuilder.route() {
         HomeScene()
     }
 }
-
-//@Composable
-//fun Contents(route: NavBackStackEntry) {
-//    Crossfade(targetState = route,animationSpec = tween(1000)) {
-//        when (it.arguments?.getString(KEY_ROUTE)) {
-//            Route.Splash.id -> SplashScene()
-//            Route.Home.id -> HomeScene()
-//            Route.Login.id -> LoginScene()
-//        }
-//    }
-//
-//}

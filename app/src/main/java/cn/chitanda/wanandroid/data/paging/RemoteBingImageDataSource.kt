@@ -5,9 +5,9 @@ import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
-import cn.chitanda.wanandroid.data.DataRepository
 import cn.chitanda.wanandroid.data.bean.BingImage
 import cn.chitanda.wanandroid.data.database.CacheRepository
+import cn.chitanda.wanandroid.data.network.NetworkRepository
 import com.tencent.mmkv.MMKV
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -47,7 +47,7 @@ class RemoteBingImageDataSource(context: Context) : RemoteMediator<Int, BingImag
                             simpleDateFormat.format(System.currentTimeMillis())
                         )
                         cacheRepository.clearCache()
-                        val images = DataRepository.getTodayImage().images
+                        val images = NetworkRepository.instance.getTodayImage().images
                         cacheRepository.cacheBingImage(images)
                         MediatorResult.Success(endOfPaginationReached = images.isEmpty())
                     }

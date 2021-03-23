@@ -5,9 +5,9 @@ import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
-import cn.chitanda.wanandroid.data.DataRepository
 import cn.chitanda.wanandroid.data.bean.Article
 import cn.chitanda.wanandroid.data.database.CacheRepository
+import cn.chitanda.wanandroid.data.network.NetworkRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -52,7 +52,7 @@ class RemoteArticleDataSource(context: Context) : RemoteMediator<Int, Article.Da
             }
             withContext(Dispatchers.IO) {
                 val response =
-                    DataRepository.getHomeArticles(page)
+                    NetworkRepository.instance.getHomeArticles(page)
                 val articles = response.data?.datas
                     ?: throw RuntimeException("failed get articles in page $page")
                 nextKey = response.data.curPage

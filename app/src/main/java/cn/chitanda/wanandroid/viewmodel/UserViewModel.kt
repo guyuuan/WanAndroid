@@ -9,9 +9,9 @@ import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
-import cn.chitanda.wanandroid.data.DataRepository
 import cn.chitanda.wanandroid.data.bean.User
 import cn.chitanda.wanandroid.data.database.CacheRepository
+import cn.chitanda.wanandroid.data.network.NetworkRepository
 import cn.chitanda.wanandroid.data.paging.RemoteBingImageDataSource
 import com.tencent.mmkv.MMKV
 import kotlinx.coroutines.Dispatchers
@@ -47,7 +47,7 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
         if (username.isBlank() || password.isBlank()) return
         launch {
             val response =
-                DataRepository.login(username, password)
+                NetworkRepository.instance.login(username, password)
             if (response.errorCode == 0 && response.data != null) {
                 _user.emit(response.data)
                 MMKV.defaultMMKV()?.apply {

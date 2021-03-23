@@ -5,9 +5,9 @@ import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
-import cn.chitanda.wanandroid.data.DataRepository
 import cn.chitanda.wanandroid.data.bean.Banner
 import cn.chitanda.wanandroid.data.database.CacheRepository
+import cn.chitanda.wanandroid.data.network.NetworkRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -37,7 +37,7 @@ class RemoteBannerDataSource(context: Context) : RemoteMediator<Int, Banner>() {
                 LoadType.REFRESH -> {
                     withContext(Dispatchers.IO) {
                         cacheRepository.clearBanners()
-                        val banners = DataRepository.getBanners().data ?: emptyList()
+                        val banners = NetworkRepository.instance.getBanners().data ?: emptyList()
                         cacheRepository.cacheBanners(banners)
                         MediatorResult.Success(endOfPaginationReached = banners.isEmpty())
                     }
