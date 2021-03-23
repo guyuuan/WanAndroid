@@ -56,7 +56,7 @@ import cn.chitanda.wanandroid.data.bean.Banner
 import cn.chitanda.wanandroid.ui.compose.Center
 import cn.chitanda.wanandroid.ui.compose.SwipeToRefreshLayout
 import cn.chitanda.wanandroid.utils.px2dp
-import cn.chitanda.wanandroid.viewmodel.ArticleViewModel
+import cn.chitanda.wanandroid.viewmodel.DataViewModel
 import com.tencent.mmkv.MMKV
 import dev.chrisbanes.accompanist.insets.statusBarsPadding
 import kotlinx.coroutines.delay
@@ -72,7 +72,7 @@ import kotlinx.coroutines.launch
 @ExperimentalPagingApi
 @Composable
 fun Articles() {
-    val viewModel = viewModel<ArticleViewModel>()
+    val viewModel = viewModel<DataViewModel>()
     val articles = viewModel.articles.collectAsLazyPagingItems()
     val banners = viewModel.banners.collectAsLazyPagingItems()
     Scaffold(modifier = Modifier

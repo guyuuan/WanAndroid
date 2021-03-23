@@ -36,9 +36,9 @@ class RemoteBannerDataSource(context: Context) : RemoteMediator<Int, Banner>() {
             when (loadType) {
                 LoadType.REFRESH -> {
                     withContext(Dispatchers.IO) {
-                        cacheRepository.clearCache()
+                        cacheRepository.clearBanners()
                         val banners = DataRepository.getBanners().data ?: emptyList()
-                        cacheRepository.cachedBanners(banners)
+                        cacheRepository.cacheBanners(banners)
                         MediatorResult.Success(endOfPaginationReached = banners.isEmpty())
                     }
                 }

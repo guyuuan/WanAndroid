@@ -16,7 +16,7 @@ import cn.chitanda.wanandroid.data.paging.RemoteBannerDataSource
  * @Date:         2021/3/10 17:40
  * @Description:
  */
-class ArticleViewModel(application: Application) : AndroidViewModel(application) {
+class DataViewModel(application: Application) : AndroidViewModel(application) {
 
     private val cacheRepository = CacheRepository.getInstance(application.applicationContext)
 

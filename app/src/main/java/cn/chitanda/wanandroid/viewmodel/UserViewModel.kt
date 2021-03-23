@@ -5,9 +5,14 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.ExperimentalPagingApi
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.cachedIn
 import cn.chitanda.wanandroid.data.DataRepository
 import cn.chitanda.wanandroid.data.bean.User
-import cn.chitanda.wanandroid.ui.navigation.Route
+import cn.chitanda.wanandroid.data.database.CacheRepository
+import cn.chitanda.wanandroid.data.paging.RemoteBingImageDataSource
 import com.tencent.mmkv.MMKV
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,15 +28,20 @@ import kotlinx.coroutines.withContext
 private const val TAG = "UserViewModel"
 
 class UserViewModel(application: Application) : AndroidViewModel(application) {
+    private val cacheRepository = CacheRepository.getInstance(application.applicationContext)
+
     private val _user = MutableStateFlow<User?>(null)
     val user: StateFlow<User?> get() = _user
 
-    init {
-        getTodayImage()
+    @ExperimentalPagingApi
+    val images by lazy {
+        Pager(
+            config = PagingConfig(pageSize = 8, enablePlaceholders = true),
+            remoteMediator = RemoteBingImageDataSource(application.applicationContext),
+            pagingSourceFactory = {
+                cacheRepository.getCachedBingImages()
+            }).flow.cachedIn(viewModelScope)
     }
-
-    private val _imageUrl = MutableStateFlow(emptyList<String>())
-    val imageUrl: StateFlow<List<String>> get() = _imageUrl
 
     fun login(username: String, password: String, callback: (Int, String) -> Unit) {
         if (username.isBlank() || password.isBlank()) return
@@ -52,18 +62,6 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
                 )
             }
             Log.d(TAG, "login: ${response.errorCode}")
-        }
-    }
-
-    private fun getTodayImage() {
-        launch {
-            val images = DataRepository.getTodayImage().images
-            if (images.isNotEmpty()) {
-                val url = "https://s.cn.bing.net" + images.first().url
-                _imageUrl.emit(images.map { "https://s.cn.bing.net" + it.url })
-                val mmkv = MMKV.defaultMMKV() ?: return@launch
-                mmkv.encode(Route.Splash.id, url)
-            }
         }
     }
 

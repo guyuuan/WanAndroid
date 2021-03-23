@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.material.BottomNavigationDefaults
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
@@ -33,6 +32,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.navigate
+import androidx.paging.ExperimentalPagingApi
+import androidx.paging.compose.collectAsLazyPagingItems
 import cn.chitanda.compose.networkimage.core.NetworkImage
 import cn.chitanda.wanandroid.R
 import cn.chitanda.wanandroid.data.bean.User
@@ -51,17 +52,17 @@ import kotlinx.coroutines.withContext
  * @Date:         2021/3/16 16:22
  * @Description:
  */
+@ExperimentalPagingApi
 @Composable
 fun Me() {
     val viewModel = LocalUserViewModel.current
     val user by viewModel.user.collectAsState()
-    val imageUrl by viewModel.imageUrl.collectAsState()
+    val images = viewModel.images.collectAsLazyPagingItems().snapshot().items
     var isLightImage by mutableStateOf(false)
     val windowInsetsController = LocalWindowInsetsController.current
-    val navController = LocalNavController.current
     Column(modifier = Modifier.fillMaxSize()) {
         NetworkImage(
-            url = imageUrl.random(),
+            url = images.random().imageUrl,
             contentDescription = "avatar",
             contentScale = ContentScale.Crop,
             modifier = Modifier
@@ -127,8 +128,10 @@ fun UserInfo(
                 }
                 Box(
                     //会被底部导航栏遮挡
-                    modifier = Modifier.padding(bottom = 60.dp)
-                        .fillMaxSize().wrapContentHeight(
+                    modifier = Modifier
+                        .padding(bottom = 60.dp)
+                        .fillMaxSize()
+                        .wrapContentHeight(
                             align = Alignment.Bottom
                         ), contentAlignment = Alignment.BottomCenter
                 ) {

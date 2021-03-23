@@ -39,7 +39,7 @@ class RemoteArticleDataSource(context: Context) : RemoteMediator<Int, Article.Da
             val page = when (loadType) {
                 LoadType.REFRESH -> {
                     withContext(Dispatchers.IO) {
-                        cacheRepository.clearCache()
+                        cacheRepository.clearArticles()
                     }
                     DEFAULT_START_PAGE
                 }

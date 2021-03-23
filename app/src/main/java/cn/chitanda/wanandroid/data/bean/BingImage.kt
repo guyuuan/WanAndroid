@@ -1,6 +1,8 @@
 package cn.chitanda.wanandroid.data.bean
 
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 
 data class BingImage(
@@ -9,38 +11,16 @@ data class BingImage(
     @SerializedName("tooltips")
     val tooltips: Tooltips
 ) {
+    @Entity(tableName = "bing")
     data class Image(
-        @SerializedName("bot")
-        val bot: Int,
-        @SerializedName("copyright")
-        val copyright: String,
-        @SerializedName("copyrightlink")
-        val copyrightlink: String,
-        @SerializedName("drk")
-        val drk: Int,
-        @SerializedName("enddate")
-        val enddate: String,
-        @SerializedName("fullstartdate")
-        val fullstartdate: String,
-        @SerializedName("hs")
-        val hs: List<Any>,
-        @SerializedName("hsh")
-        val hsh: String,
-        @SerializedName("quiz")
-        val quiz: String,
-        @SerializedName("startdate")
-        val startdate: String,
-        @SerializedName("title")
-        val title: String,
-        @SerializedName("top")
-        val top: Int,
+        @PrimaryKey
         @SerializedName("url")
         val url: String,
-        @SerializedName("urlbase")
-        val urlbase: String,
-        @SerializedName("wp")
-        val wp: Boolean
-    )
+    ) {
+        val imageUrl
+            get() = "https://s.cn.bing.net$url"
+
+    }
 
     data class Tooltips(
         @SerializedName("loading")

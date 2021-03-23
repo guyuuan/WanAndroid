@@ -7,12 +7,17 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.navigation.compose.navigate
+import androidx.paging.ExperimentalPagingApi
+import androidx.paging.LoadState
+import androidx.paging.compose.collectAsLazyPagingItems
 import cn.chitanda.compose.networkimage.core.NetworkImage
 import cn.chitanda.wanandroid.ui.compose.Center
 import cn.chitanda.wanandroid.ui.compose.LocalNavController
@@ -28,29 +33,37 @@ import kotlinx.coroutines.withContext
  * @Date:         2021/3/10 11:47
  * @Description:
  */
+@ExperimentalPagingApi
 @Composable
 fun SplashScene() {
     val navController = LocalNavController.current
     val viewModel = LocalUserViewModel.current
-    val urls by viewModel.imageUrl.collectAsState()
+    val images = viewModel.images.collectAsLazyPagingItems()
+    var bingImageLoadSuccess by remember { mutableStateOf(false) }
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colors.primary)
     ) {
-        if (urls.isNotEmpty()) NetworkImage(
-            url = urls.random(),
+        if (images.loadState.refresh is LoadState.NotLoading && images.snapshot().items.isNotEmpty()) NetworkImage(
+            url = images.snapshot().items.random().imageUrl,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop,
             onLoading = {
                 Center(Modifier.fillMaxSize()) {
                     CircularProgressIndicator(color = Color.White)
                 }
+            }, onGetBitMap = {
+                bingImageLoadSuccess = true
             }
-        )
+        ) else {
+            Center(Modifier.fillMaxSize()) {
+                CircularProgressIndicator(color = Color.White)
+            }
+        }
     }
-    LaunchedEffect(key1 = urls) {
-        if (urls.isEmpty()) return@LaunchedEffect
+    LaunchedEffect(key1 = bingImageLoadSuccess) {
+        if (!bingImageLoadSuccess) return@LaunchedEffect
         launch(Dispatchers.IO) {
             delay(3000)
             withContext(Dispatchers.Main) {
