@@ -59,8 +59,10 @@ import cn.chitanda.wanandroid.utils.px2dp
 import cn.chitanda.wanandroid.viewmodel.DataViewModel
 import com.tencent.mmkv.MMKV
 import dev.chrisbanes.accompanist.insets.statusBarsPadding
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * @Author:       Chen
@@ -188,11 +190,13 @@ fun ArticleList(articles: LazyPagingItems<Article.Data>, modifier: Modifier = Mo
         }
     }
     LaunchedEffect(key1 = mmkv) {
-        this.launch {
-            delay(500)
+        this.launch(Dispatchers.IO) {
+            delay(200)
             val scrollPosition = mmkv?.getInt("HomeArticlesScrollStatusRecord", 0) ?: 0
             val offset = mmkv?.getInt("HomeArticlesScrollStatusRecordOffset", 0) ?: 0
-            listState.animateScrollToItem(scrollPosition, offset)
+            withContext(Dispatchers.Main) {
+                listState.scrollToItem(scrollPosition, offset)
+            }
         }
     }
 

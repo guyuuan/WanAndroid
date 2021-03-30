@@ -3,6 +3,7 @@
     package="cn.chitanda.wanandroid">
 
     <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:name=".MyApp"
         android:allowBackup="true"
@@ -15,8 +16,8 @@
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:windowSoftInputMode="adjustResize"
-            android:theme="@style/Theme.WanAndroid.NoActionBar">
+            android:theme="@style/Theme.WanAndroid.NoActionBar"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -24,4 +25,5 @@
             </intent-filter>
         </activity>
     </application>
+
 </manifest>
