@@ -5,6 +5,7 @@ import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
+import cn.chitanda.wanandroid.config.Constant
 import cn.chitanda.wanandroid.data.bean.BingImage
 import cn.chitanda.wanandroid.data.database.CacheRepository
 import cn.chitanda.wanandroid.data.network.NetworkRepository
@@ -28,9 +29,12 @@ class RemoteBingImageDataSource(context: Context) : RemoteMediator<Int, BingImag
     private val simpleDateFormat by lazy { SimpleDateFormat("MM-dd") }
 
     override suspend fun initialize(): InitializeAction {
-        val cachedTime = mmkv?.decodeString("", "") ?: ""
+        val cachedTime = mmkv?.decodeString(Constant.KEY_SPLASH_CACHED_TIME, "") ?: ""
         val currentTime = simpleDateFormat.format(System.currentTimeMillis())
-        return if (currentTime != cachedTime) super.initialize() else InitializeAction.SKIP_INITIAL_REFRESH
+        return if (currentTime != cachedTime) {
+            mmkv?.encode(Constant.KEY_SPLASH_CACHED_TIME, currentTime)
+            super.initialize()
+        } else InitializeAction.SKIP_INITIAL_REFRESH
     }
 
     @ExperimentalPagingApi

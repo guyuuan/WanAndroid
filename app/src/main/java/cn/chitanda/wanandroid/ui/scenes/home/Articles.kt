@@ -51,6 +51,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemsIndexed
 import cn.chitanda.compose.networkimage.core.NetworkImage
 import cn.chitanda.wanandroid.R
+import cn.chitanda.wanandroid.config.Constant
 import cn.chitanda.wanandroid.data.bean.Article
 import cn.chitanda.wanandroid.data.bean.Banner
 import cn.chitanda.wanandroid.ui.compose.Center
@@ -182,9 +183,9 @@ fun ArticleList(articles: LazyPagingItems<Article.Data>, modifier: Modifier = Mo
 
     DisposableEffect(key1 = listState) {
         onDispose {
-            mmkv?.encode("HomeArticlesScrollStatusRecord", listState.firstVisibleItemIndex)
+            mmkv?.encode(Constant.KEY_HOME_ARTICLES_SCROLL_STATUS_POSITION, listState.firstVisibleItemIndex)
             mmkv?.encode(
-                "HomeArticlesScrollStatusRecordOffset",
+                Constant.KEY_HOME_ARTICLES_SCROLL_STATUS_OFFSETS,
                 listState.firstVisibleItemScrollOffset
             )
         }
@@ -192,8 +193,8 @@ fun ArticleList(articles: LazyPagingItems<Article.Data>, modifier: Modifier = Mo
     LaunchedEffect(key1 = mmkv) {
         this.launch(Dispatchers.IO) {
             delay(200)
-            val scrollPosition = mmkv?.getInt("HomeArticlesScrollStatusRecord", 0) ?: 0
-            val offset = mmkv?.getInt("HomeArticlesScrollStatusRecordOffset", 0) ?: 0
+            val scrollPosition = mmkv?.getInt(Constant.KEY_HOME_ARTICLES_SCROLL_STATUS_POSITION, 0) ?: 0
+            val offset = mmkv?.getInt(Constant.KEY_HOME_ARTICLES_SCROLL_STATUS_OFFSETS, 0) ?: 0
             withContext(Dispatchers.Main) {
                 listState.scrollToItem(scrollPosition, offset)
             }
