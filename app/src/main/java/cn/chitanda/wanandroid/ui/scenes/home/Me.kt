@@ -154,18 +154,20 @@ fun UserInfo(
                 }
             }
         } else {
-            TextButton(
-                onClick = {
-                    navController.navigate(Route.Login.id)
-                }, colors = ButtonDefaults.buttonColors(
-                    backgroundColor = Color.Transparent,
-                    contentColor = MaterialTheme.colors.onPrimary,
-                    disabledBackgroundColor = Color.Transparent,
-                    disabledContentColor = MaterialTheme.colors.onSurface
-                        .copy(alpha = ContentAlpha.disabled)
-                )
-            ) {
-                Text(text = "Click to login", style = MaterialTheme.typography.h5)
+           Center(Modifier.fillMaxSize()) {
+                TextButton(
+                    onClick = {
+                        navController.navigate(Route.Login.id)
+                    }, colors = ButtonDefaults.buttonColors(
+                        backgroundColor = Color.Transparent,
+                        contentColor = MaterialTheme.colors.onPrimary,
+                        disabledBackgroundColor = Color.Transparent,
+                        disabledContentColor = MaterialTheme.colors.onSurface
+                            .copy(alpha = ContentAlpha.disabled)
+                    )
+                ) {
+                    Text(text = "Click to login", style = MaterialTheme.typography.h5)
+                }
             }
         }
     }
