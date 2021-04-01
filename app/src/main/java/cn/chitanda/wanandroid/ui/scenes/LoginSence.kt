@@ -42,6 +42,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.navigate
+import androidx.navigation.compose.popUpTo
 import cn.chitanda.wanandroid.R
 import cn.chitanda.wanandroid.ui.compose.Center
 import cn.chitanda.wanandroid.ui.compose.LocalNavController
@@ -66,7 +67,8 @@ fun LoginScene() {
     var password by remember { mutableStateOf("") }
     var avatarY by remember { mutableStateOf(0.dp) }
     Center(
-        modifier = Modifier.imePadding()
+        modifier = Modifier
+            .imePadding()
             .fillMaxSize()
             .background(MaterialTheme.colors.primarySurface)
     ) {
@@ -115,8 +117,12 @@ fun LoginScene() {
                     }
                     viewModel.login(username, password) { errorCode, msg ->
                         if (errorCode == 0) {
-                            navController.popBackStack()
-                            navController.navigate(Route.Home.id)
+                            navController.navigate(Route.Home.id) {
+                                launchSingleTop = true
+                                popUpTo(Route.Login.id) {
+                                    inclusive = true
+                                }
+                            }
                         } else {
                             Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
                         }
@@ -149,8 +155,12 @@ fun LoginScene() {
                 )
                 .border(width = 6.dp, color = Color.White, shape = CircleShape)
                 .clickable {
-                    navController.popBackStack()
-                    navController.navigate(Route.Home.id)
+                    navController.navigate(Route.Home.id) {
+                        launchSingleTop = true
+                        popUpTo(Route.Login.id) {
+                            inclusive = true
+                        }
+                    }
                 }
         )
     }
