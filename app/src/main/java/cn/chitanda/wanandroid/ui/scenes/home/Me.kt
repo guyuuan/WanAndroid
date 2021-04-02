@@ -1,5 +1,7 @@
 package cn.chitanda.wanandroid.ui.scenes.home
 
+import android.content.Intent
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,14 +24,18 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.core.content.FileProvider
 import androidx.navigation.NavController
 import androidx.navigation.compose.navigate
 import androidx.paging.ExperimentalPagingApi
@@ -45,7 +51,9 @@ import cn.chitanda.wanandroid.ui.compose.LocalWindowInsetsController
 import cn.chitanda.wanandroid.ui.navigation.Route
 import cn.chitanda.wanandroid.utils.isLightImage
 import cn.chitanda.wanandroid.viewmodel.UserViewModel
+import com.bumptech.glide.Glide
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 /**
@@ -56,25 +64,51 @@ import kotlinx.coroutines.withContext
 @ExperimentalPagingApi
 @Composable
 fun Me() {
+    val context = LocalContext.current
     val viewModel = LocalUserViewModel.current
     val user by viewModel.user.collectAsState()
     val images = viewModel.images.collectAsLazyPagingItems()
     var isLightImage by mutableStateOf(false)
     val windowInsetsController = LocalWindowInsetsController.current
+    var imageClickable by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
     Column(modifier = Modifier.fillMaxSize()) {
         if (images.loadState.refresh is LoadState.NotLoading && images.snapshot().isNotEmpty()) {
+            val url = remember { images.snapshot().items.random().imageUrl }
             NetworkImage(
-                url = images.snapshot().items.random().imageUrl,
+                url = url,
                 contentDescription = "avatar",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
+                    .clickable(enabled = imageClickable) {
+                        scope.launch(Dispatchers.IO) {
+                            val future = Glide
+                                .with(context)
+                                .asFile()
+                                .load(url)
+                                .submit()
+                            val file = future.get()
+                            val uri = FileProvider.getUriForFile(
+                                context,
+                                "cn.chitanda.wanandroid.fileprovider",
+                                file
+                            )
+                            context.startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).apply {
+                                putExtra(Intent.EXTRA_STREAM, uri)
+                                type = "image/*"
+
+                            }, "分享到"))
+                        }
+                    }
                     .fillMaxWidth(),
                 onLoading = {
+                    imageClickable = false
                     Center(modifier = Modifier.fillMaxWidth()) {
                         CircularProgressIndicator(color = Color.White)
                     }
                 },
                 onGetBitMap = { bitmap ->
+                    imageClickable = true
                     withContext(Dispatchers.IO) {
                         isLightImage = isLightImage(bitmap.asAndroidBitmap())
                     }
@@ -154,7 +188,7 @@ fun UserInfo(
                 }
             }
         } else {
-           Center(Modifier.fillMaxSize()) {
+            Center(Modifier.fillMaxSize()) {
                 TextButton(
                     onClick = {
                         navController.navigate(Route.Login.id)
