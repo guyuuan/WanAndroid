@@ -56,6 +56,7 @@ import cn.chitanda.wanandroid.config.Constant
 import cn.chitanda.wanandroid.data.bean.Article
 import cn.chitanda.wanandroid.data.bean.Banner
 import cn.chitanda.wanandroid.ui.compose.Center
+import cn.chitanda.wanandroid.ui.compose.LocalDataViewmodel
 import cn.chitanda.wanandroid.ui.compose.SwipeToRefreshLayout
 import cn.chitanda.wanandroid.utils.px2dp
 import cn.chitanda.wanandroid.viewmodel.DataViewModel
@@ -76,7 +77,7 @@ import kotlinx.coroutines.withContext
 @ExperimentalPagingApi
 @Composable
 fun Articles() {
-    val viewModel = viewModel<DataViewModel>()
+    val viewModel = LocalDataViewmodel.current
     val articles = viewModel.articles.collectAsLazyPagingItems()
     val banners = viewModel.banners.collectAsLazyPagingItems()
     Scaffold(modifier = Modifier
@@ -184,23 +185,26 @@ fun ArticleList(articles: LazyPagingItems<Article.Data>, modifier: Modifier = Mo
 
     DisposableEffect(key1 = listState) {
         onDispose {
-            mmkv?.encode(Constant.KEY_HOME_ARTICLES_SCROLL_STATUS_POSITION, listState.firstVisibleItemIndex)
+            mmkv?.encode(
+                Constant.KEY_HOME_ARTICLES_SCROLL_STATUS_POSITION,
+                listState.firstVisibleItemIndex
+            )
             mmkv?.encode(
                 Constant.KEY_HOME_ARTICLES_SCROLL_STATUS_OFFSETS,
                 listState.firstVisibleItemScrollOffset
             )
         }
     }
-    LaunchedEffect(key1 = mmkv) {
-        this.launch(Dispatchers.IO) {
-            delay(200)
-            val scrollPosition = mmkv?.getInt(Constant.KEY_HOME_ARTICLES_SCROLL_STATUS_POSITION, 0) ?: 0
-            val offset = mmkv?.getInt(Constant.KEY_HOME_ARTICLES_SCROLL_STATUS_OFFSETS, 0) ?: 0
-            withContext(Dispatchers.Main) {
-                listState.scrollToItem(scrollPosition, offset)
-            }
-        }
-    }
+//    LaunchedEffect(key1 = Unit) {
+//        this.launch(Dispatchers.IO) {
+//            delay(200)
+//            val scrollPosition = mmkv?.getInt(Constant.KEY_HOME_ARTICLES_SCROLL_STATUS_POSITION, 0) ?: 0
+//            val offset = mmkv?.getInt(Constant.KEY_HOME_ARTICLES_SCROLL_STATUS_OFFSETS, 0) ?: 0
+//            withContext(Dispatchers.Main) {
+//                listState.scrollToItem(scrollPosition, offset)
+//            }
+//        }
+//    }
 
 }
 

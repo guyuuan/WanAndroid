@@ -27,7 +27,7 @@ sealed class Tab(@DrawableRes val icon: Int, val label: String) {
 
 @Composable
 fun BottomNavBar(currentTab: Tab, onClick: (Tab) -> Unit) {
-    BottomNavigation() {
+    BottomNavigation {
         Tab::class.sealedSubclasses.forEach { tab ->
             tab.objectInstance?.let {
                 BottomNavigationItem(

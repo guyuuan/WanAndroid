@@ -11,6 +11,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.paging.ExperimentalPagingApi
 import cn.chitanda.compose.networkimage.glide.ProvideGlideLoader
+import cn.chitanda.wanandroid.ui.compose.LocalDataViewmodel
 import cn.chitanda.wanandroid.ui.compose.LocalUserViewModel
 import cn.chitanda.wanandroid.ui.compose.LocalWindow
 import cn.chitanda.wanandroid.ui.compose.LocalWindowInsetsController
@@ -31,11 +32,11 @@ class MainActivity : ComponentActivity() {
             val insetsController = remember {
                 WindowInsetsControllerCompat(window, window.decorView)
             }
-            val userViewModel = viewModel<UserViewModel>()
             WanAndroidTheme {
                 CompositionLocalProvider(
                     LocalWindowInsetsController provides insetsController,
-                    LocalUserViewModel provides userViewModel,
+                    LocalUserViewModel provides viewModel(),
+                    LocalDataViewmodel provides viewModel(),
                     LocalWindow provides window,
                 ) {
                     ProvideWindowInsets(windowInsetsAnimationsEnabled = true) {
